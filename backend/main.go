@@ -9,10 +9,12 @@ import (
 	"github.com/gobwas/ws/wsutil"
 )
 
-func main() {
+func main() { 
+    /* INFO: emplementacion vieja con go routines
+    INFO: fue al pedo lo de hacer con un channel al final. Los websockets son como las http pero sin cerrar conexion nomas */
 	// canal que contiene la lista de procesos. Se actualiza cada 200 milisegundos
-	ch := make(chan *utils.ProcessesTree)
-	go utils.InicializarSistema(ch)
+    /* ch := make(chan *utils.ProcessesTree)
+	go utils.InicializarSistema(ch) */
 
 	// crear primero una conexion http
 	http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -23,11 +25,10 @@ func main() {
 			return
 		}
 
-        // handler
 		go func() {
 			defer conn.Close()
 			for {
-				// leer mensajes del cliente
+				// leer request del cliente
 				msg, op, err := wsutil.ReadClientData(conn)
 				if err != nil {
 					println(err.Error())
@@ -35,8 +36,15 @@ func main() {
 				}
 				println(string(msg))
 
-				// mandar mensajes
-				msg, err = json.Marshal(<-ch)
+                // buscar la data
+                data, err:= utils.GetData()
+                if err != nil {
+					println(err)
+					return
+                }
+
+				// mandar la respuesta
+				msg, err = json.Marshal(data)
 				err = wsutil.WriteServerMessage(conn, op, msg)
 				if err != nil {
 					println(err)

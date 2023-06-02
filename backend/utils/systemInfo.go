@@ -2,45 +2,48 @@ package utils
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/shirou/gopsutil/v3/process"
 )
 
 type Node struct {
-	Name string
-	Pid  int32
-	Mem  float32
+	Name     string  `json:"Name"`
+	Pid      int32   `json:"Pid"`
+	MemUsage float32 `json:"MemUsage"`
 }
+
 type ProcessesTree struct {
 	Childs []*ProcessesTree `json:"Childs"`
-	// TODO: crear un struct parseable a json
-	Node *Node `json:"Node"`
+	Node   *Node            `json:"Node"`
 }
 
 // Para convertir un nodo process.Process a un nodo parseable a json
-func ConvertNode(nodo *process.Process) *Node {
+func convertNode(nodo *process.Process) *Node {
 	name, _ := nodo.Name()
 	mem, _ := nodo.MemoryPercent()
 	return &Node{
-		Name: name,
-		Mem:  mem,
+		Name:     name,
+		Pid:      nodo.Pid,
+		MemUsage: mem,
 	}
 }
 
 // Inserta un nuevo nodo dentro del arbol de nodos
 func (p *ProcessesTree) insertarNodo(nodo *process.Process, parentId int32) {
-	nuevo := ProcessesTree{Node: ConvertNode(nodo), Childs: []*ProcessesTree{}}
+	newNode := ProcessesTree{
+		Node:   convertNode(nodo),
+		Childs: []*ProcessesTree{}}
+
 	// los procesos con padre 0 penden de la raiz
 	if parentId == 0 {
-		p.Childs = append(p.Childs, &nuevo)
+		p.Childs = append(p.Childs, &newNode)
 		return
 	}
 	// revisar al padre de manera recursiva
 	for _, e := range p.Childs {
 		// buscar el padre entre entre los hijos
 		if e.Node.Pid == parentId {
-			e.Childs = append(e.Childs, &nuevo)
+			e.Childs = append(e.Childs, &newNode)
 			return
 		}
 		// si no se encuentra hacerlo de manera recursiva
@@ -64,14 +67,21 @@ func createNewTree() (*ProcessesTree, error) {
 	return &raiz, nil
 }
 
+func GetData() (*ProcessesTree, error) {
+    res, err := createNewTree()
+    if err != nil {
+        return nil, err
+    }
+    return res, nil
+}
+
 // Actualiza la lista de procesos cada 200 Millisegundos
-func InicializarSistema(ch chan *ProcessesTree) {
+/* func InicializarSistema(ch chan *ProcessesTree) {
 	for {
 		time.Sleep(time.Millisecond * 200)
 		tree, err := createNewTree()
 		if err == nil {
-			<-ch       // vaciar
-			ch <- tree // actualizar
+			ch <- tree
 		}
 	}
-}
+} */

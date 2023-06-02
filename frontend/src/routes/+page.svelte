@@ -1,34 +1,37 @@
 <script lang="ts">
+    import Procesos from "./procesos.svelte";
+
+	// parseo de la api
 	interface Nodo {
-		pid: number;
+		Pid: Int32Array;
+		Name: string;
+		MemUsage: Float32Array;
 	}
 	interface Data {
-		nodo: Nodo;
-		hijos: Nodo[];
+		Node: Nodo;
+		Childs: Nodo[];
 	}
 
 	let socket: WebSocket;
-	let message: Data;
+	let procecess: Data;
 
 	function connect() {
 		socket = new WebSocket('ws://localhost:8080');
-
 		socket.onopen = () => {
 			console.log('Connected to WebSocket.');
 		};
-
 		socket.onmessage = (event) => {
-			message = JSON.parse(event.data);
-			console.log(message);
+			procecess = JSON.parse(event.data);
+			console.log(procecess);
 		};
-
 		socket.onclose = (event) => {
 			console.log(`Closed connection with code ${event.code}.`);
 		};
-	}
 
-	function send(message: string) {
-		socket.send(message);
+		// traer data cada 400 milisegundos
+		setInterval(() => {
+			socket.send('Get: ' + Date());
+		}, 500);
 	}
 
 	function disconnect() {
@@ -37,8 +40,9 @@
 </script>
 
 <button on:click={connect}>Connect</button>
-<button on:click={() => send('Hello, server!')}>Send</button>
 <button on:click={disconnect}>Disconnect</button>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<h1>Procesos activos</h1>
+<Procesos>
+
+</Procesos>

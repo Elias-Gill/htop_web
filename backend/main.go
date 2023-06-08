@@ -16,9 +16,9 @@ func main() {
     /* ch := make(chan *utils.ProcessesTree)
 	go utils.InicializarSistema(ch) */
 
-	// crear primero una conexion http
+	// Crear el server http
 	http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// convertirla en websocket
+		// Convertir la conexion a websocket
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
 		if err != nil {
 			println(err.Error())
@@ -37,7 +37,7 @@ func main() {
 				println(string(msg))
 
                 // buscar la data
-                data, err:= utils.GetData()
+                data, err:= utils.GetProcessesTree()
                 if err != nil {
 					println(err)
 					return

@@ -17,7 +17,7 @@ type ProcessesTree struct {
 	Node   *Node            `json:"Node"`
 }
 
-// Para convertir un nodo process.Process a un nodo parseable a json
+// Encapsula los datos que proporciona gopsutil en un objeto parseable
 func convertNode(nodo *process.Process) *Node {
 	name, _ := nodo.Name()
 	mem, _ := nodo.MemoryPercent()
@@ -67,7 +67,9 @@ func createNewTree() (*ProcessesTree, error) {
 	return &raiz, nil
 }
 
-func GetData() (*ProcessesTree, error) {
+// Obtiene todos los procesos del sistema, encapsula los datos en nodos parseables, los prepara como un arbol de procesos y
+// retorna el nodo raiz
+func GetProcessesTree() (*ProcessesTree, error) {
     res, err := createNewTree()
     if err != nil {
         return nil, err

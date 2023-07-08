@@ -1,26 +1,25 @@
 <script lang="ts">
-	import type { Data } from './+page.svelte';
-	import Nodo from './nodo.svelte';
+	import type { Data } from '../clases.ts';
+    import Nodo from './nodo.svelte';
 	export let data: Data;
 	export let color: number = 0;
 
 	let colorsList: string[] = ['', '#eeeeee', '#faa61a', '#a84aaf', '#1e7251', '#b0917d', '#3f2f0c'];
-	console.log(color);
+
+    function transform(e: Data) {
+        e.Childs.forEach((n) => {
+            // anadir la data al array
+            transform(n)
+        });
+    }
 </script>
 
 <export {color}>
 	{#if data}
 		<ul>
 			<li>
-				{#if data.Node}
-					<Nodo proceso={data.Node} color={colorsList[color]} />
-				{/if}
+                <Nodo proceso={data.Node} color={colorsList[color]} />
 			</li>
-			{#each data.Childs as process}
-				{#if process.Childs}
-					<svelte:self data={process} color={color + 1} />
-				{/if}
-			{/each}
 		</ul>
 	{/if}
 </export>

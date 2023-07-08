@@ -1,9 +1,8 @@
 <script lang="ts">
-	import type { Nodo } from './+page.svelte';
+	import type { Nodo_api } from '../clases.ts';
 
 	export let color: string;
-	console.log(color);
-	export let proceso: Nodo;
+	export let proceso: Nodo_api;
 </script>
 
 <export>

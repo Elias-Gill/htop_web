@@ -1,18 +1,6 @@
 <script lang="ts" context="module">
-	// parseo de la api
-	export interface Nodo {
-		Pid: Int32Array;
-		Name: string;
-		MemUsage: Float32Array;
-	}
-	export interface Data {
-		Node: Nodo;
-		Childs: Data[];
-	}
-</script>
-
-<script lang="ts">
-	import Procesos from './procesos.svelte';
+	import Procesos from '../componentes/grilla_procesos.svelte';
+    import type {Data} from '../clases.ts'
 	import '@picocss/pico';
 
 	let socket: WebSocket;
@@ -25,7 +13,6 @@
 		};
 		socket.onmessage = (event) => {
 			procecess = JSON.parse(event.data);
-			// console.log(procecess);
 		};
 		socket.onclose = (event) => {
 			console.log(`Closed connection with code ${event.code}.`);
